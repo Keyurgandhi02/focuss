@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/Button";
 
-const QUICK_SELECT_DURATIONS = [25, 45, 60, 75];
+const QUICK_SELECT_DURATIONS = [15, 45, 60, 75];
 
 export function DurationQuickSelect({ focusDuration, onDurationSelect }) {
   return (

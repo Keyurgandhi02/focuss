@@ -8,7 +8,7 @@ import { TimerCircle } from "./TimerCircle";
 import { SessionControls } from "./SessionControls";
 import { MotivationalMessage } from "./MotivationalMessage";
 
-export function TimerModule() {
+export function TimerModule({ compact = false }) {
   const {
     isPlaying,
     sessionState,
@@ -19,7 +19,6 @@ export function TimerModule() {
     timeLeft,
     totalTime,
     notificationsEnabled,
-    setSelectedMode,
     setTimeLeft,
     startSession,
     pauseSession,
@@ -75,17 +74,20 @@ export function TimerModule() {
           : "Ready to focus";
 
   return (
-    <div className="w-full flex flex-col items-center justify-center gap-6 md:gap-8">
-      {/* Mode Selection */}
-      <ModeSelector
-        selectedMode={selectedMode}
-        onModeChange={setSelectedMode}
-      />
-
+    <div
+      className={`w-full flex flex-col items-center justify-center ${
+        compact ? "gap-4" : "gap-6 md:gap-8"
+      }`}
+    >
+      <ModeSelector />
       {/* Timer Display Section */}
-      <div className="relative w-full max-w-3xl">
-        <div className="absolute inset-0 rounded-4xl bg-white/5 blur-3xl" />
-        <div className="relative overflow-hidden rounded-4xl border border-white/10 bg-white/5 p-10 shadow-2xl backdrop-blur-xl">
+      <div className={`relative w-full ${compact ? "max-w-lg" : "max-w-3xl"}`}>
+        <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 via-transparent to-blue-500/10 blur-2xl" />
+        <div
+          className={`relative overflow-hidden rounded-4xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl hover:scale-[1.01] transition-all duration-300 ${
+            compact ? "p-6" : "p-10"
+          }`}
+        >
           <div className="relative flex flex-col items-center justify-center gap-8">
             {/* Circular Progress Timer */}
             <TimerCircle
@@ -95,7 +97,11 @@ export function TimerModule() {
             />
 
             {/* Session Label */}
-            <p className="text-sm uppercase tracking-[0.25em] text-white/60">
+            <p
+              className={`uppercase tracking-[0.25em] text-white/60 ${
+                compact ? "text-xs" : "text-sm"
+              }`}
+            >
               {sessionLabel}
             </p>
 

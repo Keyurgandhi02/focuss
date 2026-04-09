@@ -10,66 +10,56 @@ export function useTimer(
   startBreak,
 ) {
   const intervalRef = useRef(null);
+  const handledRef = useRef(false);
 
   useEffect(() => {
-    if (isPlaying && timeLeft > 0) {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            if (intervalRef.current) {
-              clearInterval(intervalRef.current);
-              intervalRef.current = null;
-            }
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+    if (!isPlaying || timeLeft <= 0) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      return;
     }
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-    };
-  }, [isPlaying, setTimeLeft]);
+    intervalRef.current = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(intervalRef.current);
+  }, [isPlaying]);
 
   useEffect(() => {
-    if (timeLeft === 0 && isPlaying) {
-      if (sessionState === "work") {
-        completeSession();
+    if (timeLeft > 0) {
+      handledRef.current = false; // reset when running
+      return;
+    }
 
-        if (notificationsEnabled) {
-          if (
-            "Notification" in window &&
-            Notification.permission === "granted"
-          ) {
-            new Notification("Work session complete! Time for a break 🎉");
-          }
-        }
+    if (!isPlaying || handledRef.current) return;
 
-        setTimeout(() => startBreak(), 2000);
-      } else if (sessionState === "break") {
-        completeSession();
+    handledRef.current = true;
 
-        if (notificationsEnabled) {
-          if (
-            "Notification" in window &&
-            Notification.permission === "granted"
-          ) {
-            new Notification("Break is over! Ready for another round? 🚀");
-          }
-        }
+    const notify = (title, body) => {
+      if (
+        notificationsEnabled &&
+        "Notification" in window &&
+        Notification.permission === "granted"
+      ) {
+        new Notification(title, { body });
       }
+    };
+
+    if (sessionState === "work") {
+      completeSession();
+
+      notify("Focus complete 🎉", "Great job! Time for a break.");
+
+      setTimeout(() => {
+        startBreak();
+
+        notify("Break started ☕", "Relax and recharge.");
+      }, 1000);
+    } else if (sessionState === "break") {
+      completeSession();
+
+      notify("Break over 🚀", "Ready for next focus session?");
     }
   }, [
     timeLeft,

@@ -1,6 +1,6 @@
-"use client";
-
 import { Button } from "@/components/ui/Button";
+import useAppStore from "@/store/useAppStore";
+import useModalStore from "@/store/useModalStore";
 
 const MODE_OPTIONS = [
   { id: "focus", label: "Focus" },
@@ -8,15 +8,29 @@ const MODE_OPTIONS = [
   { id: "longBreak", label: "Long Break" },
 ];
 
-export function ModeSelector({ selectedMode, onModeChange }) {
+export function ModeSelector() {
+  const { selectedMode, setSelectedMode, isPlaying, resetSession } =
+    useAppStore();
+
+  const { openModal } = useModalStore();
+
+  const handleModeChange = (modeId) => {
+    if (isPlaying) {
+      openModal({
+        title: "Change Mode?",
+        description: "Your current session will be ended.",
+        onConfirm: () => {
+          resetSession();
+          setSelectedMode(modeId);
+        },
+      });
+    } else {
+      setSelectedMode(modeId);
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl text-center">
-      <p className="text-sm uppercase tracking-[0.32em] text-white/50 mb-4">
-        What do you want to focus on?
-      </p>
-      <h1 className="text-2xl md:text-4xl lg:text-5xl max-w-2xl mx-auto font-semibold text-white leading-tight">
-        Choose a timer mode and sink into your next session.
-      </h1>
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         {MODE_OPTIONS.map((mode) => (
           <Button
@@ -24,7 +38,7 @@ export function ModeSelector({ selectedMode, onModeChange }) {
             variant={selectedMode === mode.id ? "primary" : "secondary"}
             size="md"
             className="rounded-full px-6 py-3"
-            onClick={() => onModeChange(mode.id)}
+            onClick={() => handleModeChange(mode.id)}
           >
             {mode.label}
           </Button>

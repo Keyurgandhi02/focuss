@@ -2,9 +2,9 @@
 
 import { TimerDisplay } from "./TimerDisplay";
 
-export function TimerCircle({ timeLeft, progress, displayTime }) {
+export function TimerCircle({  progress, displayTime }) {
   return (
-    <div className="relative w-64 h-64 md:w-80 md:h-80 mx-auto">
+    <div className="relative w-64 h-64 md:w-90 md:h-90 mx-auto">
       <svg className="absolute inset-0 w-full h-full transform -rotate-90">
         <circle
           cx="50%"
@@ -12,7 +12,7 @@ export function TimerCircle({ timeLeft, progress, displayTime }) {
           r="47%"
           fill="none"
           stroke="rgba(255,255,255,0.12)"
-          strokeWidth="3"
+          strokeWidth="8"
         />
         <circle
           cx="50%"
@@ -20,7 +20,7 @@ export function TimerCircle({ timeLeft, progress, displayTime }) {
           r="47%"
           fill="none"
           stroke="url(#gradient)"
-          strokeWidth="6"
+          strokeWidth="7"
           strokeDasharray={`${(progress / 100) * 300} 300`}
           strokeLinecap="round"
           style={{ transition: "stroke-dasharray 1s linear" }}

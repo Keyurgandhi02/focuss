@@ -3,6 +3,8 @@ import { create } from "zustand";
 const useAppStore = create((set) => ({
   // Theme state
   theme: "system",
+  isFocusMode: false,
+  setFocusMode: (val) => set({ isFocusMode: val }),
 
   // Timer state
   isPlaying: false,
@@ -84,13 +86,18 @@ const useAppStore = create((set) => ({
 
       return {
         isPlaying: true,
+        isFocusMode: true,
         sessionState,
         timeLeft: duration * 60,
         totalTime: duration * 60,
       };
     }),
-  pauseSession: () => set({ isPlaying: false }),
-  resumeSession: () => set({ isPlaying: true }),
+  pauseSession: () =>
+    set((state) => ({
+      isPlaying: false,
+      isFocusMode: true,
+    })),
+  resumeSession: () => set({ isPlaying: true, isFocusMode: true }),
   resetSession: () =>
     set((state) => {
       const duration =
@@ -105,15 +112,18 @@ const useAppStore = create((set) => ({
         sessionState: "idle",
         timeLeft: duration * 60,
         totalTime: duration * 60,
+        isFocusMode: false,
       };
     }),
-  completeSession: () => set({ sessionState: "completed", isPlaying: false }),
+  completeSession: () =>
+    set({ sessionState: "completed", isPlaying: false, isFocusMode: false }),
   startBreak: () =>
     set((state) => ({
       sessionState: "break",
       timeLeft: state.breakDuration * 60,
       totalTime: state.breakDuration * 60,
       isPlaying: true,
+      isFocusMode: true,
     })),
 
   // Local storage persistence

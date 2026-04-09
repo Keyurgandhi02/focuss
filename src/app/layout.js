@@ -3,10 +3,18 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar/Navbar";
 import "./globals.css";
+import { GlobalModal } from "@/components/ui/GlobalModal";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
 export default function RootLayout({ children }) {
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <html lang="en" className="h-full">
@@ -23,6 +31,7 @@ export default function RootLayout({ children }) {
             {children}
           </main>
           <Navbar />
+          <GlobalModal />
         </body>
       </html>
     </QueryClientProvider>

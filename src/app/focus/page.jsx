@@ -3,20 +3,25 @@
 import { useEffect } from "react";
 import useAppStore from "@/store/useAppStore";
 import { TimerModule } from "@/components/Focus/TimerModule";
+import { TodoPanel } from "@/components/Todo/TodoPanel";
 
 export default function FocusPage() {
-  const { loadSettingsFromLocalStorage } = useAppStore();
+  const { loadSettingsFromLocalStorage, isFocusMode } = useAppStore();
 
   useEffect(() => {
     loadSettingsFromLocalStorage();
   }, [loadSettingsFromLocalStorage]);
 
   return (
-    <div className="min-h-dvh flex items-center justify-center px-6 pb-23">
-      <div className="w-full max-w-5xl mx-auto flex flex-col items-center justify-center">
-        <div className="w-full flex items-center justify-center">
-          <TimerModule />
-        </div>
+    <div className="fixed inset-0 flex bg-black/30 backdrop-blur-xl">
+      <div className="w-[45%] flex items-center justify-center px-10">
+        <TimerModule compact />
+      </div>
+
+      <div className="w-px bg-white/10" />
+
+      <div className="w-[55%] h-full px-8 py-10 overflow-y-auto">
+        <TodoPanel />
       </div>
     </div>
   );
