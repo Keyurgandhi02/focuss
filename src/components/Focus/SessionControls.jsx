@@ -1,5 +1,3 @@
-"use client";
-
 import { Play, Pause, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
