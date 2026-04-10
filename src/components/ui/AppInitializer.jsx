@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import useAppStore from "@/store/useAppStore";
+import { useTimerStore } from "@/store/useTimerStore";
+import { useAnalyticsStore } from "@/store/useAnalyticsStore";
 
 export function AppInitializer() {
   useEffect(() => {
-    if ("Notification" in window && Notification.permission === "default") {
-      Notification.requestPermission();
-    }
-    useAppStore.getState().loadStats();
-    useAppStore.getState().loadStreak();
+    useTimerStore.persist.rehydrate();
+    useAnalyticsStore.persist.rehydrate();
   }, []);
 
   return null;

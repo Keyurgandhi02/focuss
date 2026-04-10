@@ -1,23 +1,22 @@
 "use client";
 
-import useAppStore from "@/store/useAppStore";
 import { useTimer } from "@/hooks/useTimer";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { ModeSelector } from "./ModeSelector";
 import { TimerCircle } from "./TimerCircle";
 import { SessionControls } from "./SessionControls";
 import { MotivationalMessage } from "./MotivationalMessage";
+import { useTimerStore } from "@/store/useTimerStore";
 
-export function TimerModule({ compact = false }) {
+export function TimerModule() {
   const {
-    isPlaying,
     sessionState,
-    focusDuration,
-    breakDuration,
-    longBreakDuration,
     selectedMode,
     timeLeft,
     totalTime,
+    focusDuration,
+    breakDuration,
+    longBreakDuration,
     notificationsEnabled,
     setTimeLeft,
     startSession,
@@ -26,11 +25,38 @@ export function TimerModule({ compact = false }) {
     resetSession,
     completeSession,
     startBreak,
-  } = useAppStore();
+  } = useTimerStore();
 
-  // Custom hooks for logic extraction
+  const isRunning = sessionState === "work" || sessionState === "break";
+
+  const idleDurationMap = {
+    focus: focusDuration,
+    shortBreak: breakDuration,
+    longBreak: longBreakDuration,
+  };
+
+  const idleDuration = idleDurationMap[selectedMode];
+
+  const displayTime = sessionState === "idle" ? idleDuration * 60 : timeLeft;
+
+  const progress =
+    sessionState === "idle"
+      ? 0
+      : totalTime > 0
+        ? ((totalTime - timeLeft) / totalTime) * 100
+        : 0;
+
+  const sessionLabelMap = {
+    work: "Work Mode",
+    break: "Break Time",
+    completed: "Session Complete",
+    idle: "Ready to focus",
+  };
+
+  const sessionLabel = sessionLabelMap[sessionState] || "Ready";
+
   useTimer(
-    isPlaying,
+    isRunning,
     timeLeft,
     sessionState,
     notificationsEnabled,
@@ -40,7 +66,7 @@ export function TimerModule({ compact = false }) {
   );
 
   useKeyboardShortcuts(
-    isPlaying,
+    isRunning,
     sessionState,
     startSession,
     pauseSession,
@@ -48,79 +74,53 @@ export function TimerModule({ compact = false }) {
     resetSession,
   );
 
-  // Calculate durations and display values
-  const idleDuration =
-    selectedMode === "focus"
-      ? focusDuration
-      : selectedMode === "shortBreak"
-        ? breakDuration
-        : longBreakDuration;
-
-  const displayTime = sessionState === "idle" ? idleDuration * 60 : timeLeft;
-  const progress =
-    sessionState === "idle"
-      ? 0
-      : totalTime > 0
-        ? ((totalTime - timeLeft) / totalTime) * 100
-        : 0;
-
-  const sessionLabel =
-    sessionState === "work"
-      ? "Work Mode"
-      : sessionState === "break"
-        ? "Break Time"
-        : sessionState === "completed"
-          ? "Session Complete"
-          : "Ready to focus";
-
   return (
-    <div
-      className={`w-full flex flex-col items-center justify-center ${
-        compact ? "gap-4" : "gap-6 md:gap-8"
-      }`}
-    >
-      <ModeSelector />
-      {/* Timer Display Section */}
-      <div className={`relative w-full ${compact ? "max-w-lg" : "max-w-3xl"}`}>
-        <div className="absolute inset-0 bg-linear-to-br from-purple-500/10 via-transparent to-blue-500/10 blur-2xl" />
-        <div
-          className={`relative overflow-hidden rounded-4xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-xl hover:scale-[1.01] transition-all duration-300 ${
-            compact ? "p-6" : "p-10"
-          }`}
-        >
-          <div className="relative flex flex-col items-center justify-center gap-8">
-            {/* Circular Progress Timer */}
-            <TimerCircle
-              displayTime={displayTime}
-              progress={progress}
-              timeLeft={timeLeft}
-            />
+    <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(99,102,241,0.15),transparent_60%)]" />
 
-            {/* Session Label */}
-            <p
-              className={`uppercase tracking-[0.25em] text-white/60 ${
-                compact ? "text-xs" : "text-sm"
-              }`}
-            >
-              {sessionLabel}
-            </p>
+      <div
+        className={`absolute w-100 h-100 rounded-full transition-all duration-700 ${
+          sessionState === "work" ? "bg-blue-500/10" : "bg-purple-500/10"
+        } blur-2xl opacity-40`}
+      />
 
-            {/* Control Buttons */}
-            <SessionControls
-              sessionState={sessionState}
-              isPlaying={isPlaying}
-              selectedMode={selectedMode}
-              onStart={startSession}
-              onPause={pauseSession}
-              onResume={resumeSession}
-              onReset={resetSession}
-            />
-          </div>
+      {/* MODE SELECTOR */}
+      <div className="absolute top-15 left-1/2 -translate-x-1/2 z-20">
+        <ModeSelector />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center text-center">
+        <h1 className="text-[80px] md:text-[110px] font-semibold text-white tracking-tight leading-none">
+          {Math.floor(displayTime / 60)
+            .toString()
+            .padStart(2, "0")}
+          :{(displayTime % 60).toString().padStart(2, "0")}
+        </h1>
+
+        <p className="mt-2 text-white/40 text-xs tracking-[0.35em] uppercase">
+          {sessionLabel}
+        </p>
+
+        <div className="mt-10">
+          <TimerCircle progress={progress} />
         </div>
       </div>
 
-      {/* Motivational Message */}
-      <MotivationalMessage sessionState={sessionState} />
+      <div className="absolute bottom-24 z-20">
+        <SessionControls
+          sessionState={sessionState}
+          isPlaying={isRunning}
+          selectedMode={selectedMode}
+          onStart={startSession}
+          onPause={pauseSession}
+          onResume={resumeSession}
+          onReset={resetSession}
+        />
+      </div>
+
+      <div className="absolute bottom-8 text-white/30 text-sm z-20">
+        <MotivationalMessage sessionState={sessionState} />
+      </div>
     </div>
   );
 }

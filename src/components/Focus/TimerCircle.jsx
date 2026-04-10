@@ -1,40 +1,35 @@
-"use client";
-
-import { TimerDisplay } from "./TimerDisplay";
-
-export function TimerCircle({  progress, displayTime }) {
+export function TimerCircle({ progress }) {
   return (
-    <div className="relative w-64 h-64 md:w-90 md:h-90 mx-auto">
-      <svg className="absolute inset-0 w-full h-full transform -rotate-90">
+    <div className="relative w-72 h-72">
+      <svg className="absolute inset-0 w-full h-full -rotate-90">
         <circle
           cx="50%"
           cy="50%"
-          r="47%"
+          r="45%"
+          stroke="rgba(255,255,255,0.08)"
+          strokeWidth="10"
           fill="none"
-          stroke="rgba(255,255,255,0.12)"
-          strokeWidth="8"
         />
+
         <circle
           cx="50%"
           cy="50%"
-          r="47%"
-          fill="none"
+          r="45%"
           stroke="url(#gradient)"
-          strokeWidth="7"
-          strokeDasharray={`${(progress / 100) * 300} 300`}
+          strokeWidth="10"
+          fill="none"
           strokeLinecap="round"
-          style={{ transition: "stroke-dasharray 1s linear" }}
+          strokeDasharray={`${progress * 2.8} 280`}
+          style={{ transition: "all 0.6s ease" }}
         />
+
         <defs>
-          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#4f46e5" />
-            <stop offset="100%" stopColor="#ec4899" />
+          <linearGradient id="gradient">
+            <stop offset="0%" stopColor="#6366f1" />
+            <stop offset="100%" stopColor="#a855f7" />
           </linearGradient>
         </defs>
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <TimerDisplay timeLeft={displayTime} />
-      </div>
     </div>
   );
 }

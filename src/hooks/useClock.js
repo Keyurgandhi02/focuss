@@ -9,20 +9,25 @@ export function useClock() {
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
-      const hours = now.getHours();
+      const hours24 = now.getHours();
 
-      setTime(
-        now.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          hour12: true,
-        }),
-      );
+      const formattedTime = new Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: true,
+      }).format(now);
 
-      if (hours >= 5 && hours < 12) setGreeting("Good morning!");
-      else if (hours < 17) setGreeting("Good afternoon!");
-      else if (hours < 21) setGreeting("Good evening!");
-      else setGreeting("Good night!");
+      setTime(formattedTime);
+
+      if (hours24 >= 5 && hours24 < 12) {
+        setGreeting("Good morning!");
+      } else if (hours24 >= 12 && hours24 < 17) {
+        setGreeting("Good afternoon!");
+      } else if (hours24 >= 17 && hours24 < 21) {
+        setGreeting("Good evening!");
+      } else {
+        setGreeting("Good night!");
+      }
     };
 
     updateTime();

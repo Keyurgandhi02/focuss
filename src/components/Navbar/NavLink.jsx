@@ -1,27 +1,33 @@
 "use client";
 
-import useAppStore from "@/store/useAppStore";
-import useModalStore from "@/store/useModalStore";
 import { usePathname, useRouter } from "next/navigation";
+import { useTimerStore } from "@/store/useTimerStore";
+import { useUIStore } from "@/store/useUIStore";
+import useModalStore from "@/store/useModalStore";
 
 export default function NavLink({ href, children }) {
   const path = usePathname();
   const router = useRouter();
-  const { isFocusMode, setFocusMode, pauseSession } = useAppStore();
+
+  const { resetSession, sessionState, setSelectedMode } = useTimerStore();
+
   const { openModal } = useModalStore();
 
+  const isSessionRunning = sessionState === "work" || sessionState === "break";
+
   const handleClick = () => {
-    if (isFocusMode) {
+    if (path === href) return;
+
+    if (isSessionRunning) {
       openModal({
         title: "Focus Mode Active",
-        description:
-          "You're currently in a focus session. Are you sure you want to leave?",
+        description: `You're in a ${sessionState} session. Leaving will be ended your ${sessionState} session.`,
         onConfirm: () => {
-          pauseSession();
-          setFocusMode(false);
+          resetSession();
           router.push(href);
         },
       });
+
       return;
     }
 
@@ -31,7 +37,15 @@ export default function NavLink({ href, children }) {
   return (
     <button
       onClick={handleClick}
-      className={`cursor-pointer rounded-lg px-4 py-2 text-sm font-semibold text-white/80 transition-colors duration-300 ${path === href ? "bg-white/10 text-white" : "hover:bg-white/10"}`}
+      className={`
+        relative px-4 py-2 text-sm font-medium rounded-xl
+        transition-all duration-300 cursor-pointer
+        ${
+          path === href
+            ? "text-white bg-white/10 shadow-inner"
+            : "text-white/60 hover:text-white hover:bg-white/10"
+        }
+      `}
     >
       {children}
     </button>
