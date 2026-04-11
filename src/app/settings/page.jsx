@@ -5,12 +5,9 @@ import { useRouter } from "next/navigation";
 import { Card } from "@/components/ui/Card";
 import { TimerSettingsSection } from "@/components/Settings/TimerSettingsSection";
 import { PreferencesSection } from "@/components/Settings/PreferencesSection";
-import { ProductivityTips } from "@/components/Settings/ProductivityTips";
 import { useTimerStore } from "@/store/useTimerStore";
 
 export default function SettingsPage() {
-  const router = useRouter();
-
   const {
     focusDuration,
     breakDuration,

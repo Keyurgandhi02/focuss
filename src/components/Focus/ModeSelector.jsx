@@ -1,3 +1,6 @@
+"use client";
+
+import { memo } from "react";
 import useModalStore from "@/store/useModalStore";
 import { useTimerStore } from "@/store/useTimerStore";
 
@@ -7,10 +10,13 @@ const MODE_OPTIONS = [
   { id: "longBreak", label: "Long Break" },
 ];
 
-export function ModeSelector() {
-  const { selectedMode, setSelectedMode, resetSession, sessionState } =
-    useTimerStore();
-  const { openModal } = useModalStore();
+export const ModeSelector = memo(function ModeSelector() {
+  const selectedMode = useTimerStore((s) => s.selectedMode);
+  const setSelectedMode = useTimerStore((s) => s.setSelectedMode);
+  const resetSession = useTimerStore((s) => s.resetSession);
+  const sessionState = useTimerStore((s) => s.sessionState);
+
+  const openModal = useModalStore((s) => s.openModal);
 
   const isSessionRunning = sessionState === "work" || sessionState === "break";
 
@@ -18,7 +24,7 @@ export function ModeSelector() {
     if (isSessionRunning) {
       openModal({
         title: "Change Mode?",
-        description: `You're in a ${sessionState} session. Leaving will be ended your ${sessionState} session.`,
+        description: `You're in a ${sessionState} session. This will end it.`,
         onConfirm: () => {
           resetSession();
           setSelectedMode(modeId);
@@ -59,13 +65,9 @@ export function ModeSelector() {
           `}
           >
             {mode.label}
-
-            {active && (
-              <span className="absolute inset-0 rounded-full blur-xl opacity-40" />
-            )}
           </button>
         );
       })}
     </div>
   );
-}
+});

@@ -25,6 +25,7 @@ export const useTimerStore = create(
 
       notificationsEnabled: true,
       soundEnabled: true,
+      soundMode: "off",
 
       /* ACTIONS */
 
@@ -53,7 +54,9 @@ export const useTimerStore = create(
           };
         }),
 
-      pauseSession: () => set({ isPlaying: false, sessionState: "paused" }),
+      pauseSession: () => {
+        set({ isPlaying: false, sessionState: "paused" });
+      },
       resumeSession: () =>
         set((state) => {
           return {
@@ -62,7 +65,7 @@ export const useTimerStore = create(
           };
         }),
 
-      resetSession: () =>
+      resetSession: () => {
         set((state) => {
           const duration = getDuration(state, state.selectedMode) * 60;
 
@@ -72,7 +75,8 @@ export const useTimerStore = create(
             timeLeft: duration,
             totalTime: duration,
           };
-        }),
+        });
+      },
 
       setFocusDuration: (duration) =>
         set((state) => {
@@ -141,7 +145,10 @@ export const useTimerStore = create(
             totalTime: duration,
           };
         }),
+
+      setSoundMode: (mode) => set({ soundMode: mode }),
     }),
+
     {
       name: "workmode-timer", // 🔥 localStorage key
     },
