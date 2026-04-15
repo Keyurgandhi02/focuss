@@ -12,8 +12,21 @@ export function useKeyboardShortcuts(
 ) {
   useEffect(() => {
     const handleKeyPress = (e) => {
-      if (e.code === "Space") {
+      const isInputFocused =
+        document.activeElement?.tagName === "INPUT" ||
+        document.activeElement?.tagName === "TEXTAREA" ||
+        document.activeElement?.isContentEditable;
+
+      // ❌ Ignore if typing
+      if (isInputFocused) return;
+
+      const isCmd = e.metaKey; // Mac ⌘
+      const isCtrl = e.ctrlKey; // Windows Ctrl
+
+      // ▶️ PLAY / PAUSE (Cmd/Ctrl + Space)
+      if ((isCmd || isCtrl) && e.code === "Space") {
         e.preventDefault();
+
         if (isPlaying) {
           pauseSession();
         } else if (sessionState === "idle") {
@@ -23,7 +36,8 @@ export function useKeyboardShortcuts(
         }
       }
 
-      if (e.code === "KeyR") {
+      // 🔄 RESET (Cmd/Ctrl + R)
+      if ((isCmd || isCtrl) && e.code === "KeyR") {
         e.preventDefault();
         resetSession();
       }
